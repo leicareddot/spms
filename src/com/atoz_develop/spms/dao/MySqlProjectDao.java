@@ -28,31 +28,35 @@ public class MySqlProjectDao implements ProjectDao {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 
-        conn = dataSource.getConnection();
-        pstmt = conn.prepareStatement(
-                "SELECT PNO, PNAME, CONTENT, STA_DATE, END_DATE, STATE, CRE_DATE, TAGS" +
-                        " FROM PROJECTS" +
-                        " ORDER BY CRE_DATE DESC"
-        );
-        rs = pstmt.executeQuery();
-
-        while (rs.next()) {
-            projects.add(new Project()
-                    .setNo(rs.getInt("PNO"))
-                    .setTitle(rs.getString("PNAME"))
-                    .setContent(rs.getString("CONTENT"))
-                    .setStartDate(rs.getDate("STA_DATE"))
-                    .setEndDate(rs.getDate("END_DATE"))
-                    .setState(rs.getInt("STATE"))
-                    .setCreatedDate(rs.getDate("CRE_DATE"))
-                    .setTags(rs.getString("TAGS"))
+        try {
+            conn = dataSource.getConnection();
+            pstmt = conn.prepareStatement(
+                    "SELECT PNO, PNAME, STA_DATE, END_DATE, STATE, CRE_DATE" +
+                            " FROM PROJECTS" +
+                            " ORDER BY CRE_DATE DESC"
             );
+            rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                projects.add(new Project()
+                        .setNo(rs.getInt("PNO"))
+                        .setTitle(rs.getString("PNAME"))
+                        .setStartDate(rs.getDate("STA_DATE"))
+                        .setEndDate(rs.getDate("END_DATE"))
+                        .setState(rs.getInt("STATE"))
+                        .setCreatedDate(rs.getDate("CRE_DATE"))
+                );
+            }
+
+            return projects;
+
+        } catch (SQLException e) {
+            throw e;
+
+        } finally {
+            if (rs != null) rs.close();
+            if (pstmt != null) pstmt.close();
+            if (conn != null) conn.close();
         }
-
-        if (rs != null) rs.close();
-        if (pstmt != null) pstmt.close();
-        if (conn != null) conn.close();
-
-        return projects;
     }
 }
