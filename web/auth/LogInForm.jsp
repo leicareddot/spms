@@ -13,10 +13,10 @@
 <body>
 <h2>로그인</h2>
 <form action="login.do" method="post">
-    학번: <input type="text" name="studentNo"><br>
+    이메일: <input type="text" name="email"><br>
     비밀번호: <input type="password" name="password"><br>
     <input type="submit" value="로그인">
-    <input type='button' value='취소' onClick='location.href="${pageContext.request.contextPath}/student/list.do"'>
+    <input type='button' value='취소' onClick='location.href="${pageContext.request.contextPath}/member/list.do"'>
 </form>
 </body>
 </html>

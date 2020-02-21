@@ -23,7 +23,7 @@
     </context-param>
     <context-param>
         <param-name>url</param-name>
-        <param-value>jdbc:mysql://localhost:3307/knou</param-value>
+        <param-value>jdbc:mysql://localhost:3307/spms</param-value>
     </context-param>
     <context-param>
         <param-name>username</param-name>

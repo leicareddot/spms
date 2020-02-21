@@ -2,23 +2,23 @@ package com.atoz_develop.spms.controls;
 
 import com.atoz_develop.spms.annotation.Component;
 import com.atoz_develop.spms.bind.DataBinding;
-import com.atoz_develop.spms.dao.MySqlStudentDao;
-import com.atoz_develop.spms.vo.Student;
+import com.atoz_develop.spms.dao.MemberDao;
+import com.atoz_develop.spms.vo.Member;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 @Component("/auth/login.do")
 public class LogInController implements Controller, DataBinding {
-    MySqlStudentDao studentDao;
+    MemberDao memberDao;
 
     /**
-     * StudentDao를 주입받기 위한 setter()
-     * @param studentDao
+     * MemberDao를 주입받기 위한 setter()
+     * @param memberDao
      * @return LogInController
      */
-    public LogInController setStudentDao(MySqlStudentDao studentDao) {
-        this.studentDao = studentDao;
+    public LogInController setMemberDao(MemberDao memberDao) {
+        this.memberDao = memberDao;
         return this;
     }
 
@@ -28,24 +28,24 @@ public class LogInController implements Controller, DataBinding {
      */
     @Override
     public Object[] getDataBinders() {
-        return new Object[]{"studentNo", String.class, "password", String.class};
+        return new Object[]{"email", String.class, "password", String.class};
     }
 
     @Override
     public String execute(Map<String, Object> model) throws Exception {
-        String studentNo = (String) model.get("studentNo");
+        String email = (String) model.get("email");
         String password = (String) model.get("password");
 
-        if(studentNo == null) {    // Form 조회
+        if(email == null) {    // Form 조회
             return "/auth/LogInForm.jsp";
         } else {    // 로그인
-            Student student = studentDao.exist(studentNo, password);
-            if(student == null) {
+            Member member = memberDao.exist(email, password);
+            if(member == null) {
                 return "/auth/LogInFail.jsp";
             } else {
-                ((HttpSession) model.get("session")).setAttribute("student", student);
+                ((HttpSession) model.get("session")).setAttribute("member", member);
 
-                return "redirect:/student/list.do";
+                return "redirect:/member/list.do";
             }
         }
     }

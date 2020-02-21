@@ -1,4 +1,4 @@
-<%@ page import="com.atoz_develop.spms.vo.Student" %><%--
+<%--
   Created by IntelliJ IDEA.
   User: Yoon
   Date: 2020-02-12
@@ -11,13 +11,13 @@
     <b>SPMS</b>(Simple Project Management System)
     <span style="float: right;">
     <c:choose>
-        <c:when test="${empty sessionScope.student}">
+        <c:when test="${empty sessionScope.member}">
                 <a href="add.do" style="color: white;">회원가입</a>&nbsp|
                 <a href="../auth/login.do" style="color: white;">로그인</a>
             </span>
     </c:when>
     <c:otherwise>
-        ${sessionScope.student.studentName}
+        ${sessionScope.member.name}
         <a href="../auth/logout.do" style="color: white;">로그아웃</a>
     </c:otherwise>
     </c:choose>
