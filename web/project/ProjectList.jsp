@@ -14,7 +14,7 @@
 <body>
 <jsp:include page="/Header.jsp"/>
 <h3>프로젝트 목록</h3>
-<a href="add.do">신규 프로젝트 등록</a><br>
+<p><a href="add.do">신규 프로젝트 등록</a></p>
 <table style="border-collapse: collapse; width: 100%;" border="1">
     <tbody>
     <tr>
