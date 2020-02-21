@@ -8,7 +8,7 @@
 <jsp:include page="/Header.jsp"/>
 <h3>회원 목록</h3>
 <c:forEach var="member" items="${members}">
-    <c:if test="${sessionScope.member.email == 'admin@test.com'}">
+    <c:if test="${sessionScope.member.email eq 'admin@test.com'}">
         <input type="button" value="삭제" onClick="location.href='delete.do?no=${member.no}'" />
     </c:if>
     ${member.no},
