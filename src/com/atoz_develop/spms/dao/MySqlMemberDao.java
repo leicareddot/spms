@@ -147,15 +147,17 @@ public class MySqlMemberDao implements MemberDao {
                             " FROM MEMBERS" +
                             " WHERE MNO = " + no
             );
-            rs.next();
 
-            return new Member()
-                    .setNo(no)
-                    .setEmail(rs.getString("EMAIL"))
-                    .setName(rs.getString("MNAME"))
-                    .setCreatedDate(rs.getDate("CRE_DATE"))
-                    .setModifiedDate(rs.getDate("MOD_DATE"));
-
+            if(rs.next()) {
+                return new Member()
+                        .setNo(no)
+                        .setEmail(rs.getString("EMAIL"))
+                        .setName(rs.getString("MNAME"))
+                        .setCreatedDate(rs.getDate("CRE_DATE"))
+                        .setModifiedDate(rs.getDate("MOD_DATE"));
+            } else {
+                throw new SQLException("해당 번호의 회원을 찾을 수 없습니다.");
+            }
         } finally {
             try {
                 if (rs != null) rs.close();
