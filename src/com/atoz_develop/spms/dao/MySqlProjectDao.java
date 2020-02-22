@@ -2,175 +2,88 @@ package com.atoz_develop.spms.dao;
 
 import com.atoz_develop.spms.annotation.Component;
 import com.atoz_develop.spms.vo.Project;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
-import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component("projectDao")
 public class MySqlProjectDao implements ProjectDao {
 
-    private DataSource dataSource;
+    // myBatis - SqlSessionFactory: SqlSession 객체 생성
+    private SqlSessionFactory sqlSessionFactory;
 
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
     }
 
     @Override
     public List<Project> selectList() throws SQLException {
-        List<Project> projects = new ArrayList<>();
 
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+        // myBatis - SqlSession: SQL 실행
+        // openSession(): SqlSession 얻기
+        SqlSession sqlSession = sqlSessionFactory.openSession();
 
         try {
-            conn = dataSource.getConnection();
-            pstmt = conn.prepareStatement(
-                    "SELECT PNO, PNAME, STA_DATE, END_DATE, STATE, CRE_DATE" +
-                            " FROM PROJECTS" +
-                            " ORDER BY CRE_DATE DESC"
-            );
-            rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                projects.add(new Project()
-                        .setNo(rs.getInt("PNO"))
-                        .setTitle(rs.getString("PNAME"))
-                        .setStartDate(rs.getDate("STA_DATE"))
-                        .setEndDate(rs.getDate("END_DATE"))
-                        .setState(rs.getInt("STATE"))
-                        .setCreatedDate(rs.getDate("CRE_DATE"))
-                );
-            }
-
-            return projects;
-
-        } catch (SQLException e) {
-            throw e;
-
+            // selectList(): SELECT
+            // 파라미터: SQL 맵퍼의 네임 스페이스(com.atoz_develop.spms.dao.ProjectDao) + SQL문 ID(selectList)
+            return sqlSession.selectList("com.atoz_develop.spms.dao.ProjectDao.selectList");
         } finally {
-            if (rs != null) rs.close();
-            if (pstmt != null) pstmt.close();
-            if (conn != null) conn.close();
+            sqlSession.close();
         }
     }
 
     @Override
     public int insert(Project project) throws SQLException {
-
-        Connection conn = null;
-        PreparedStatement pstmt = null;
+//        SqlSession sqlSession = sqlSessionFactory.openSession(true);  // auto commit
+        SqlSession sqlSession = sqlSessionFactory.openSession();
 
         try {
-            conn = dataSource.getConnection();
-            pstmt = conn.prepareStatement(
-                "INSERT INTO PROJECTS(PNAME, CONTENT, STA_DATE, END_DATE, STATE, CRE_DATE, TAGS)" +
-                        " VALUES(?, ?, ?, ?, 0, NOW(), ?)"
-            );
-            pstmt.setString(1, project.getTitle());
-            pstmt.setString(2, project.getContent());
-            pstmt.setDate(3, new java.sql.Date(project.getStartDate().getTime()));
-            pstmt.setDate(4, new java.sql.Date(project.getEndDate().getTime()));
-            pstmt.setString(5, project.getTags());
+            // insert(): INSERT
+            int count = sqlSession.insert("com.atoz_develop.spms.dao.ProjectDao.insert", project);
+            sqlSession.commit();
 
-            return pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw e;
-
+            return count;
         } finally {
-            if(pstmt != null) pstmt.close();
-            if(conn != null) conn.close();
+            sqlSession.close();
         }
     }
 
     @Override
     public Project selectOne(int no) throws SQLException {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
 
+        SqlSession sqlSession = sqlSessionFactory.openSession();
         try {
-            conn = dataSource.getConnection();
-            pstmt = conn.prepareStatement(
-                    "SELECT PNO, PNAME, CONTENT, STA_DATE, END_DATE, STATE, CRE_DATE, TAGS" +
-                            " FROM PROJECTS" +
-                            " WHERE PNO = " + no
-            );
-            rs = pstmt.executeQuery();
-
-            if(rs.next()) {
-                return new Project()
-                        .setNo(rs.getInt("PNO"))
-                        .setTitle(rs.getString("PNAME"))
-                        .setContent(rs.getString("CONTENT"))
-                        .setStartDate(rs.getDate("STA_DATE"))
-                        .setEndDate(rs.getDate("END_DATE"))
-                        .setState(rs.getInt("STATE"))
-                        .setCreatedDate(rs.getDate("CRE_DATE"))
-                        .setTags(rs.getString("TAGS"));
-            } else {
-                throw new SQLException("해당 번호의 프로젝트를 찾을 수 없습니다.");
-            }
-        } catch (SQLException e) {
-            throw e;
+            return sqlSession.selectOne("com.atoz_develop.spms.dao.ProjectDao.selectOne", no);
         } finally {
-            if (rs != null) rs.close();
-            if (pstmt != null) pstmt.close();
-            if (conn != null) conn.close();
+            sqlSession.close();
         }
     }
 
     @Override
     public int update(Project project) throws SQLException {
 
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-
+        SqlSession sqlSession = sqlSessionFactory.openSession();
         try {
-            conn = dataSource.getConnection();
-            pstmt = conn.prepareStatement(
-                "UPDATE PROJECTS SET PNAME = ?, CONTENT = ?, STA_DATE = ?, END_DATE = ?, STATE = 0, TAGS = ?" +
-                        " WHERE PNO = ?"
-            );
-            pstmt.setString(1, project.getTitle());
-            pstmt.setString(2, project.getContent());
-            pstmt.setDate(3, new Date(project.getStartDate().getTime()));
-            pstmt.setDate(4, new Date(project.getEndDate().getTime()));
-            pstmt.setString(5, project.getTags());
-            pstmt.setInt(6, project.getNo());
-
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
+            int count = sqlSession.update("com.atoz_develop.spms.dao.ProjectDao.update", project);
+            sqlSession.commit();
+            return count;
         } finally {
-            if(pstmt != null) pstmt.close();
-            if(conn != null) conn.close();
+            sqlSession.close();
         }
     }
 
     @Override
     public int delete(int no) throws SQLException {
 
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-
+        SqlSession sqlSession = sqlSessionFactory.openSession();
         try {
-            conn = dataSource.getConnection();
-            pstmt = conn.prepareStatement(
-                    "DELETE FROM PROJECTS" +
-                            " WHERE PNO = ?"
-            );
-            pstmt.setInt(1, no);
-
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
+            int count = sqlSession.delete("com.atoz_develop.spms.dao.ProjectDao.delete", no);
+            sqlSession.commit();
+            return count;
         } finally {
-            if(pstmt != null) pstmt.close();
-            if(conn != null) conn.close();
+            sqlSession.close();
         }
     }
 }

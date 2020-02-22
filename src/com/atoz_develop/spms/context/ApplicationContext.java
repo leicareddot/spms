@@ -1,6 +1,7 @@
 package com.atoz_develop.spms.context;
 
 import com.atoz_develop.spms.annotation.Component;
+import com.atoz_develop.spms.vo.Project;
 import org.reflections.Reflections;
 
 import javax.naming.Context;
@@ -22,33 +23,29 @@ public class ApplicationContext {
         return objTable.get(key);
     }
 
-    public ApplicationContext(String propertiesPath) throws Exception {
-        // 프로퍼티 파일 로딩
-        Properties props = new Properties();
-        props.load(new FileReader(propertiesPath));
-
-        prepareObjects(props);      // propertiesPath의 프로퍼티 파일에 정의된 객체 생성
-        prepareAnnotationObjects(); // @Component가 붙은 클래스 객체 생성
-        injectDependency();         // 의존성 주입
+    // 외부에서 생성한 객체 등록용
+    public void addBean(String name, Object obj) {
+        objTable.put(name, obj);
     }
 
     /**
      * 프로퍼티에 따라 객체 준비
-     * @param props
+     * @param propertiesPath
      * @throws Exception
      */
-    private void prepareObjects(Properties props) throws Exception {
-        Context context = new InitialContext(); // JNDI 객체를 찾기 위해
+    public void prepareObjectsByProperties(String propertiesPath) throws Exception {
+        Properties props = new Properties();
+        props.load(new FileReader(propertiesPath));
+
+        Context ctx = new InitialContext();
         String key = null;
         String value = null;
 
-        // 프로퍼티를 꺼내 객체를 생성하고 저장(put)
         for (Object item: props.keySet()) {
             key = (String) item;
             value = props.getProperty(key);
-
-            if (key.startsWith("jndi.")) {  // key가 jndi.로 시작하면 객체를 생성하지 않고 InitialContext를 통해 얻는다.
-                objTable.put(key, context.lookup(value));
+            if (key.startsWith("jndi.")) {
+                objTable.put(key, ctx.lookup(value));
             } else {
                 objTable.put(key, Class.forName(value).getDeclaredConstructor().newInstance());
             }
@@ -59,7 +56,7 @@ public class ApplicationContext {
      * 각 객체가 필요로 하는 의존 객체 할당
      * @throws Exception
      */
-    private void injectDependency() throws Exception {
+    public void injectDependency() throws Exception {
         for (String key: objTable.keySet()) {
             if (!key.startsWith("jndi.")) {
                 callSetter(objTable.get(key));  // Setter 호출
@@ -107,21 +104,14 @@ public class ApplicationContext {
      * 오픈소스 라이브러리 Reflections 사용: 자바 리플랙션 API보다 사용하기 쉽고 편함
      * @throws Exception
      */
-    private void prepareAnnotationObjects() throws Exception {
-        // Reflections 클래스는 원하는 클래스를 찾기 위해 사용
-        // 파라미터값은 클래스를 찾을때 출발 패키지
-        // "" -> classpath 모든 패키지 검색
-        Reflections reflector = new Reflections("");
-        // getTypesAnnotatedWith():
-        // 파라미터값으로 넘긴 어노테이션이 붙은 클래스를 찾는다.
-        // 반환값: @Component 어노테이션이 선언된 클래스 목록
+    public void prepareObjectsByAnnotation(String basePackage) throws Exception {
+        Reflections reflector = new Reflections(basePackage);
+
         Set<Class<?>> list = reflector.getTypesAnnotatedWith(Component.class);
         String key = null;
         for(Class<?> clazz: list) {
-            // getAnnotation(): 클래스로부터 어노테이션 추출
             key = clazz.getAnnotation(Component.class).value();
             objTable.put(key, clazz.getDeclaredConstructor().newInstance());
-//            System.out.println(clazz.getName() + "(" + key + ") -> 객체 준비 완료");
         }
     }
 }
