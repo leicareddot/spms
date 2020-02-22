@@ -160,7 +160,7 @@ public class MySqlProjectDao implements ProjectDao {
         try {
             conn = dataSource.getConnection();
             pstmt = conn.prepareStatement(
-                    "DELETE FROM PROJETS" +
+                    "DELETE FROM PROJECTS" +
                             " WHERE PNO = ?"
             );
             pstmt.setInt(1, no);
