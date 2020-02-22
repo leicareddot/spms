@@ -28,7 +28,7 @@
     <c:forEach var="project" items="${projects}">
         <tr>
             <td style="width: 16.6667%;">${project.no}</td>
-            <td style="width: 16.6667%;">${project.title}</td>
+            <td style="width: 16.6667%;"><a href="update.do?no=${project.no}">${project.title}</a></td>
             <td style="width: 16.6667%;">${project.startDate}</td>
             <td style="width: 16.6667%;">${project.endDate}</td>
             <td style="width: 16.6667%;">${project.state}</td>

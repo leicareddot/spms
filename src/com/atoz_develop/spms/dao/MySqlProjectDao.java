@@ -4,10 +4,7 @@ import com.atoz_develop.spms.annotation.Component;
 import com.atoz_develop.spms.vo.Project;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -128,6 +125,52 @@ public class MySqlProjectDao implements ProjectDao {
 
     @Override
     public int update(Project project) throws SQLException {
-        return 0;
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = dataSource.getConnection();
+            pstmt = conn.prepareStatement(
+                "UPDATE PROJECTS SET PNAME = ?, CONTENT = ?, STA_DATE = ?, END_DATE = ?, STATE = 0, TAGS = ?" +
+                        " WHERE PNO = ?"
+            );
+            pstmt.setString(1, project.getTitle());
+            pstmt.setString(2, project.getContent());
+            pstmt.setDate(3, new Date(project.getStartDate().getTime()));
+            pstmt.setDate(4, new Date(project.getEndDate().getTime()));
+            pstmt.setString(5, project.getTags());
+            pstmt.setInt(6, project.getNo());
+
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if(pstmt != null) pstmt.close();
+            if(conn != null) conn.close();
+        }
+    }
+
+    @Override
+    public int delete(int no) throws SQLException {
+
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+
+        try {
+            conn = dataSource.getConnection();
+            pstmt = conn.prepareStatement(
+                    "DELETE FROM PROJETS" +
+                            " WHERE PNO = ?"
+            );
+            pstmt.setInt(1, no);
+
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw e;
+        } finally {
+            if(pstmt != null) pstmt.close();
+            if(conn != null) conn.close();
+        }
     }
 }

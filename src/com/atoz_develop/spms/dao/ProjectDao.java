@@ -10,4 +10,5 @@ public interface ProjectDao {
     int insert(Project project) throws SQLException;
     Project selectOne(int no) throws SQLException;
     int update(Project project) throws SQLException;
+    int delete(int no) throws SQLException;
 }
