@@ -7,7 +7,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<div style="background-color: darkcyan; color: aliceblue; height: 20px; padding: 5px;">
+<div style="background-color: darkcyan; color: aliceblue; height: 65px; padding: 5px;">
     <b>SPMS</b>(Simple Project Management System)
     <span style="float: right;">
     <c:choose>
@@ -22,4 +22,6 @@
     </c:otherwise>
     </c:choose>
     </span>
+    <p>MENU : <span><a href="${pageContext.request.contextPath}/project/list.do">프로젝트</a>&nbsp|</span>
+        <span><a href="${pageContext.request.contextPath}/member/list.do">회원</a></span></p>
 </div>
