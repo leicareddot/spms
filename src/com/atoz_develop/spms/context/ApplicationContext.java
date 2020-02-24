@@ -1,7 +1,6 @@
 package com.atoz_develop.spms.context;
 
 import com.atoz_develop.spms.annotation.Component;
-import com.atoz_develop.spms.vo.Project;
 import org.reflections.Reflections;
 
 import javax.naming.Context;
@@ -13,6 +12,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+/**
+ * 자바 빈 관리 클래스
+ */
 public class ApplicationContext {
 
     // 만든 객체 보관용

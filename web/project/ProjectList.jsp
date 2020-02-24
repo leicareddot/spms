@@ -18,11 +18,71 @@
 <table style="border-collapse: collapse; width: 100%;" border="1">
     <tbody>
     <tr>
-        <td style="width: 11.6667%;">번호</td>
-        <td style="width: 21.6667%;">제목</td>
-        <td style="width: 16.6667%;">시작일</td>
-        <td style="width: 16.6667%;">종료일</td>
-        <td style="width: 16.6667%;">상태</td>
+        <td style="width: 11.6667%;">
+            <c:choose>
+                <c:when test="${orderCond == 'PNO_ASC'}">
+                    <a href="list.do?orderCond=PNO_DESC">번호↑</a>
+                </c:when>
+                <c:when test="${orderCond == 'PNO_DESC'}">
+                    <a href="list.do?orderCond=PNO_ASC">번호↓</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="list.do?orderCond=PNO_ASC">번호</a>
+                </c:otherwise>
+            </c:choose>
+        </td>
+        <td style="width: 21.6667%;">
+            <c:choose>
+                <c:when test="${orderCond == 'TITLE_ASC'}">
+                    <a href="list.do?orderCond=TITLE_DESC">제목↑</a>
+                </c:when>
+                <c:when test="${orderCond == 'TITLE_DESC'}">
+                    <a href="list.do?orderCond=TITLE_ASC">제목↓</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="list.do?orderCond=TITLE_ASC">제목</a>
+                </c:otherwise>
+            </c:choose>
+        </td>
+        <td style="width: 16.6667%;">
+            <c:choose>
+                <c:when test="${orderCond == 'STARTDATE_ASC'}">
+                    <a href="list.do?orderCond=STARTDATE_DESC">시작일↑</a>
+                </c:when>
+                <c:when test="${orderCond == 'STARTDATE_DESC'}">
+                    <a href="list.do?orderCond=STARTDATE_ASC">시작일↓</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="list.do?orderCond=STARTDATE_ASC">시작일</a>
+                </c:otherwise>
+            </c:choose>
+        </td>
+        <td style="width: 16.6667%;">
+            <c:choose>
+                <c:when test="${orderCond == 'ENDDATE_ASC'}">
+                    <a href="list.do?orderCond=ENDDATE_DESC">종료일↑</a>
+                </c:when>
+                <c:when test="${orderCond == 'ENDDATE_DESC'}">
+                    <a href="list.do?orderCond=ENDDATE_ASC">종료일↓</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="list.do?orderCond=ENDDATE_ASC">종료일</a>
+                </c:otherwise>
+            </c:choose>
+        </td>
+        <td style="width: 16.6667%;">
+            <c:choose>
+                <c:when test="${orderCond == 'STATE_ASC'}">
+                    <a href="list.do?orderCond=STATE_DESC">상태↑</a>
+                </c:when>
+                <c:when test="${orderCond == 'STATE_DESC'}">
+                    <a href="list.do?orderCond=STATE_ASC">상태↓</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="list.do?orderCond=STATE_ASC">상태</a>
+                </c:otherwise>
+            </c:choose>
+        </td>
         <td style="width: 16.6667%;">삭제</td>
     </tr>
     <c:forEach var="project" items="${projects}">

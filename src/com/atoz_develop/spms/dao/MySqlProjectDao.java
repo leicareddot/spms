@@ -7,6 +7,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.sql.*;
 import java.util.List;
+import java.util.Map;
 
 @Component("projectDao")
 public class MySqlProjectDao implements ProjectDao {
@@ -19,7 +20,7 @@ public class MySqlProjectDao implements ProjectDao {
     }
 
     @Override
-    public List<Project> selectList() throws SQLException {
+    public List<Project> selectList(Map<String, Object> paramMap) throws SQLException {
 
         // myBatis - SqlSession: SQL 실행
         // openSession(): SqlSession 얻기
@@ -28,7 +29,7 @@ public class MySqlProjectDao implements ProjectDao {
         try {
             // selectList(): SELECT
             // 파라미터: SQL 맵퍼의 네임 스페이스(com.atoz_develop.spms.dao.ProjectDao) + SQL문 ID(selectList)
-            return sqlSession.selectList("com.atoz_develop.spms.dao.ProjectDao.selectList");
+            return sqlSession.selectList("com.atoz_develop.spms.dao.ProjectDao.selectList", paramMap);
         } finally {
             sqlSession.close();
         }
@@ -36,7 +37,7 @@ public class MySqlProjectDao implements ProjectDao {
 
     @Override
     public int insert(Project project) throws SQLException {
-//        SqlSession sqlSession = sqlSessionFactory.openSession(true);  // auto commit
+    //        SqlSession sqlSession = sqlSessionFactory.openSession(true);  // auto commit
         SqlSession sqlSession = sqlSessionFactory.openSession();
 
         try {
