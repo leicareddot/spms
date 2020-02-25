@@ -1,15 +1,17 @@
 package com.atoz_develop.spms.controls;
 
 import com.atoz_develop.spms.annotation.Component;
+import com.atoz_develop.spms.bind.DataBinding;
 import com.atoz_develop.spms.dao.MemberDao;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 회원 목록 조회
  */
 @Component("/member/list.do")
-public class MemberListController implements Controller {
+public class MemberListController implements Controller, DataBinding {
     MemberDao memberDao;
 
     /**
@@ -23,8 +25,17 @@ public class MemberListController implements Controller {
     }
 
     @Override
+    public Object[] getDataBinders() {
+        return new Object[]{"orderCond", String.class};
+    }
+
+    @Override
     public String execute(Map<String, Object> model) throws Exception {
-        model.put("members", memberDao.selectList());
+        Map<String, Object> paramMap = new HashMap<>();
+        if(model.get("orderCond") != null) {
+            paramMap.put("orderCond", model.get("orderCond"));
+        }
+        model.put("members", memberDao.selectList(paramMap));
 
         return "/member/MemberList.jsp";
     }

@@ -23,5 +23,11 @@
 
     <mappers>
         <mapper resource="com/atoz_develop/spms/dao/MySqlProjectDao.xml"/>
+        <mapper resource="com/atoz_develop/spms/dao/MySqlMemberDao.xml"/>
     </mappers>
 </configuration>
+
+
+
+
+

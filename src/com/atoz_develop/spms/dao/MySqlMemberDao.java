@@ -2,18 +2,27 @@ package com.atoz_develop.spms.dao;
 
 import com.atoz_develop.spms.annotation.Component;
 import com.atoz_develop.spms.vo.Member;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component("memberDao")
 public class MySqlMemberDao implements MemberDao {
 
+    SqlSessionFactory sqlSessionFactory;
+
+    public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
+    }
+
     DataSource ds;
 
-    public void setDataSource(DataSource ds) {
+    public void setDs(DataSource ds) {
         this.ds = ds;
     }
 
@@ -23,45 +32,13 @@ public class MySqlMemberDao implements MemberDao {
      * @return 회원 목록
      * @throws SQLException
      */
-    public List<Member> selectList() throws SQLException {
-        Connection connection = null;
-        Statement stmt = null;
-        ResultSet rs = null;
+    public List<Member> selectList(Map<String, Object> paramMap) throws SQLException {
+        SqlSession sqlSession = sqlSessionFactory.openSession();
 
-        List<Member> members = null;
         try {
-            connection = ds.getConnection();
-            stmt = connection.createStatement();
-            rs = stmt.executeQuery(
-                    "SELECT MNO, EMAIL, MNAME, CRE_DATE, MOD_DATE" +
-                            " FROM MEMBERS" +
-                            " WHERE EMAIL != 'admin@test.com'" +
-                            " ORDER BY MNO"
-            );
-
-            members = new ArrayList<>();
-
-            while (rs.next()) {
-                members.add(new Member()
-                        .setNo(rs.getInt("MNO"))
-                        .setEmail(rs.getString("EMAIL"))
-                        .setName(rs.getString("MNAME"))
-                        .setCreatedDate(rs.getDate("CRE_DATE"))
-                        .setModifiedDate(rs.getDate("MOD_DATE"))
-                );
-            }
-
-            return members;
-
-        } catch (SQLException e) {
-            throw e;
+            return sqlSession.selectList("com.atoz_develop.spms.dao.MemberDao.selectList", paramMap);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
-            } catch (Exception e) {
-            }
+            sqlSession.close();
         }
     }
 

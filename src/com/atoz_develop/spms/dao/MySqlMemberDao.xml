@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atoz_develop.spms.dao.MemberDao">
+    <resultMap id="member" type="member">
+        <id column="MNO" property="no"/>
+        <result column="EMAIL" property="email"/>
+        <result column="MNAME" property="name"/>
+        <result column="CRE_DATE" property="createdDate" javaType="java.sql.Date"/>
+    </resultMap>
+    <select id="selectList" parameterType="map" resultMap="member">
+        select MNO, EMAIL, MNAME, CRE_DATE
+        from members
+        where EMAIL != 'admin@test.com'
+        order by
+        <choose>
+            <when test="orderCond == 'EMAIL_ASC'">EMAIL ASC</when>
+            <when test="orderCond == 'EMAIL_DESC'">EMAIL DESC</when>
+            <when test="orderCond == 'NAME_ASC'">MNAME ASC</when>
+            <when test="orderCond == 'NAME_DESC'">MNAME DESC</when>
+            <when test="orderCond == 'CREATED_DATE_ASC'">CRE_DATE ASC</when>
+            <when test="orderCond == 'CREATED_DATE_DESC'">CRE_DATE DESC</when>
+            <otherwise>MNO ASC</otherwise>
+        </choose>
+    </select>
+</mapper>

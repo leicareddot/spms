@@ -4,6 +4,7 @@ import com.atoz_develop.spms.vo.Member;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public interface MemberDao {
     /**
@@ -12,7 +13,7 @@ public interface MemberDao {
      * @return 회원 목록
      * @throws SQLException
      */
-    List<Member> selectList() throws SQLException;
+    List<Member> selectList(Map<String, Object> paramMap) throws SQLException;
 
     /**
      * 신규 회원 등록
