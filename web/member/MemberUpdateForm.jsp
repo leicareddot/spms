@@ -17,6 +17,7 @@
     번호: <input type='text' name='no' value='${requestScope.member.no}' readonly><br>
     이름: <input type='text' name='name' value='${requestScope.member.name}'><br>
     이메일: <input type='text' name='email' value='${requestScope.member.email}'><br>
+    비밀번호: <input type='password' name='password' value='${requestScope.member.password}'><br>
     가입일: <input type='text' name='createdDate' value='${requestScope.member.createdDate}' readonly><br>
     <input type='submit' value='수정'>
     <c:if test="${sessionScope.member.email == 'admin@test.com'}">

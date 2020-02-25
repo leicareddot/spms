@@ -36,7 +36,7 @@ public class LogInController implements Controller, DataBinding {
         String email = (String) model.get("email");
         String password = (String) model.get("password");
 
-        if(email == null) {    // Form 조회
+        if(email == null) {    // Form 출력
             return "/auth/LogInForm.jsp";
         } else {    // 로그인
             Member member = memberDao.exist(email, password);

@@ -7,7 +7,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,29 +50,14 @@ public class MySqlMemberDao implements MemberDao {
      * @throws SQLException
      */
     public int insert(Member member) throws SQLException {
-        Connection connection = null;
-        PreparedStatement pstmt = null;
+        SqlSession sqlSession = sqlSessionFactory.openSession();
 
         try {
-            connection = ds.getConnection();
-            pstmt = connection.prepareStatement(
-                    "INSERT INTO MEMBERS(EMAIL, PWD, MNAME, CRE_DATE, MOD_DATE)" +
-                            " VALUES (?, ?, ?, NOW(), NOW())"
-            );
-
-            pstmt.setString(1, member.getEmail());
-            pstmt.setString(2, member.getPassword());
-            pstmt.setString(3, member.getName());
-
-            return pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-            throw e;
+            int result = sqlSession.insert("com.atoz_develop.spms.dao.MemberDao.insert", member);
+            sqlSession.commit();
+            return result;
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-                if (connection != null) connection.close();
-            } catch (Exception e) { }
+            sqlSession.close();
         }
     }
 
@@ -84,23 +69,14 @@ public class MySqlMemberDao implements MemberDao {
      * @throws SQLException
      */
     public int delete(int no) throws SQLException {
-        Connection connection = null;
-        PreparedStatement pstmt = null;
+        SqlSession sqlSession = sqlSessionFactory.openSession();
 
         try {
-            connection = ds.getConnection();
-            pstmt = connection.prepareStatement(
-                    "DELETE FROM MEMBERS WHERE MNO = ?"
-            );
-            pstmt.setInt(1, no);
-
-            return pstmt.executeUpdate();
+            int count = sqlSession.delete("com.atoz_develop.spms.dao.MemberDao.delete", no);
+            sqlSession.commit();
+            return count;
         } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-                if (connection != null) connection.close();
-            } catch (Exception e) {
-            }
+            sqlSession.close();
         }
     }
 
@@ -112,38 +88,14 @@ public class MySqlMemberDao implements MemberDao {
      * @throws SQLException
      */
     public Member selectOne(int no) throws SQLException {
-        Connection connection = null;
-        Statement stmt = null;
-        ResultSet rs = null;
+        SqlSession sqlSession = sqlSessionFactory.openSession();
 
         try {
-            connection = ds.getConnection();
-            stmt = connection.createStatement();
-            rs = stmt.executeQuery(
-                    "SELECT MNO, EMAIL, MNAME, CRE_DATE, MOD_DATE" +
-                            " FROM MEMBERS" +
-                            " WHERE MNO = " + no
-            );
-
-            if(rs.next()) {
-                return new Member()
-                        .setNo(no)
-                        .setEmail(rs.getString("EMAIL"))
-                        .setName(rs.getString("MNAME"))
-                        .setCreatedDate(rs.getDate("CRE_DATE"))
-                        .setModifiedDate(rs.getDate("MOD_DATE"));
-            } else {
-                throw new SQLException("해당 번호의 회원을 찾을 수 없습니다.");
-            }
+            return sqlSession.selectOne("com.atoz_develop.spms.dao.MemberDao.selectOne", no);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (connection != null) connection.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            sqlSession.close();
         }
+
     }
 
     /**
@@ -154,23 +106,25 @@ public class MySqlMemberDao implements MemberDao {
      * @throws SQLException
      */
     public int update(Member member) throws SQLException {
-        Connection connection = null;
-        PreparedStatement pstmt = null;
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
         try {
-            connection = ds.getConnection();
-            pstmt = connection.prepareStatement(
-                    "UPDATE MEMBERS SET MNAME = ?, EMAIL = ?, MOD_DATE = NOW() WHERE MNO = ?"
-            );
-            pstmt.setString(1, member.getName());
-            pstmt.setString(2, member.getEmail());
-            pstmt.setInt(3, member.getNo());
-            return pstmt.executeUpdate();
-        } finally {
-            try {
-                if (pstmt != null) pstmt.close();
-                if (connection != null) connection.close();
-            } catch (Exception e) {
+            Member original = selectOne(member.getNo());
+            Map<String, Object> paramMap = new HashMap<>();
+            if(!member.getName().equals(original.getName())) paramMap.put("name", member.getName());
+            if(!member.getEmail().equals(original.getEmail())) paramMap.put("email", member.getEmail());
+            if(!member.getPassword().equals(original.getPassword())) paramMap.put("password", member.getPassword());
+
+            if(paramMap.size() > 0) {
+                paramMap.put("no", member.getNo());
+                int count = sqlSession.update("com.atoz_develop.spms.dao.MemberDao.update", paramMap);
+                sqlSession.commit();
+                return count;
             }
+
+            return 0;
+        } finally {
+            sqlSession.close();
         }
     }
 
@@ -182,33 +136,16 @@ public class MySqlMemberDao implements MemberDao {
      * @throws SQLException
      */
     public Member exist(String email, String password) throws SQLException {
-        Connection connection = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("email", email);
+        paramMap.put("password", password);
 
         try {
-            // DB에서 회원 정보 조회
-            connection = ds.getConnection();
-            pstmt = connection.prepareStatement(
-                    "SELECT MNAME FROM MEMBERS" +
-                            " WHERE EMAIL = ? AND PWD = ?"
-            );
-            pstmt.setString(1, email);
-            pstmt.setString(2, password);
-            rs = pstmt.executeQuery();
-
-            // 일치하는 회원 있으면
-            if (rs.next()) {
-                return new Member()
-                        .setName(rs.getString("MNAME"))
-                        .setEmail(email);
-            } else return null;
+            return sqlSession.selectOne("com.atoz_develop.spms.dao.MemberDao.exist", paramMap);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (pstmt != null) pstmt.close();
-                if (connection != null) connection.close();
-            } catch (Exception e) { }
+            sqlSession.close();
         }
     }
 }
