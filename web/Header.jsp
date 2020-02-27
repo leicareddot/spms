@@ -17,7 +17,7 @@
             </span>
     </c:when>
     <c:otherwise>
-        ${sessionScope.member.name}
+        <a href="${pageContext.request.contextPath}/member/update.do?no=${sessionScope.member.no}">${sessionScope.member.name}</a>
         <a href="../auth/logout.do" style="color: white;">로그아웃</a>
     </c:otherwise>
     </c:choose>

@@ -20,12 +20,6 @@ public class MySqlMemberDao implements MemberDao {
         this.sqlSessionFactory = sqlSessionFactory;
     }
 
-    DataSource ds;
-
-    public void setDs(DataSource ds) {
-        this.ds = ds;
-    }
-
     /**
      * 회원 목록 조회
      *

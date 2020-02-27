@@ -14,7 +14,8 @@
     <select id="selectList" parameterType="map" resultMap="memberResultMap">
         select MNO, EMAIL, MNAME, CRE_DATE
         from members
-        where EMAIL != 'admin@test.com'
+        where 1 = 1
+        and EMAIL != 'admin@test.com'
         order by
         <choose>
             <when test="orderCond == 'EMAIL_ASC'">EMAIL ASC</when>
@@ -30,11 +31,12 @@
     <select id="selectOne" parameterType="int" resultMap="memberResultMap">
         select MNO, EMAIL, MNAME, PWD, CRE_DATE
         from MEMBERS
-        where MNO = #{no}
+        where 1 = 1
+        and MNO = #{no}
     </select>
 
     <select id="exist" parameterType="map" resultMap="memberResultMap">
-        select MNAME, EMAIL
+        select MNAME, EMAIL, MNO
         from MEMBERS
         where 1 = 1
           and EMAIL = #{email}
@@ -54,12 +56,14 @@
             <if test="email != null">EMAIL = #{email},</if>
             <if test="password != null">PWD = #{password},</if>
         </set>
-        where MNO = #{no}
+        where 1 = 1
+        and MNO = #{no}
     </update>
 
     <delete id="delete" parameterType="int">
         delete
         from members
-        where MNO = #{no}
+        where 1 = 1
+        and MNO = #{no}
     </delete>
 </mapper>
